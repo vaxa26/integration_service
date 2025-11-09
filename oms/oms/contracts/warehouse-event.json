@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://shop-ag.local/schemas/wms/order-status-event.json",
+  "title": "Order Status Event",
+  "description": "Event-Nachricht, die das Order Management System (OMS) an das Warehouse Management System (WMS) sendet, um Statusänderungen mitzuteilen.",
+  "type": "object",
+  "required": ["event", "orderId", "status", "at", "correlationId"],
+  "properties": {
+    "event": {
+      "type": "string",
+      "enum": ["ORDER_STATUS_CHANGED"],
+      "description": "Name des Ereignisses"
+    },
+    "orderId": {
+      "type": "string",
+      "description": "Eindeutige ID der Bestellung"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PAID", "CANCELLED", "PICKED", "PACKED", "SHIPPED", "PROCESSED"],
+      "description": "Aktueller Status der Bestellung"
+    },
+    "at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Zeitpunkt der Statusänderung (UTC)"
+    },
+    "correlationId": {
+      "type": "string",
+      "description": "ID zur Nachverfolgung über mehrere Systeme"
+    }
+  },
+  "additionalProperties": false,
+  "examples": [
+    {
+      "event": "ORDER_STATUS_CHANGED",
+      "orderId": "ORD-2025-10-16-7891",
+      "status": "PAID",
+      "at": "2025-11-08T14:12:00Z",
+      "correlationId": "abc123-corr-id"
+    }
+  ]
+}

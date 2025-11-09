@@ -1,0 +1,32 @@
+opneapi: 3.1.0
+info: { title: Payment Service, version: 1.0.0, description: Payment Service API for processing payments }
+servers: [{ url: http://payment:8000/api/v1 }]
+paths:
+  /payments:
+    post:
+      summary : Process a payment
+      requestBody:
+        required: true
+        content:
+          application/json:
+            type: object
+            required: [orderId, amount, currency, paymentMethod]
+            properties:
+              orderId: { type: sting }
+              amount: { type: number, minimum: 0 }
+              currency: { type: string, enum: [USD, EUR, GBP] }
+              paymentMethod: { type: string, enum: [CARD, PAYPAL, INVOICE] }
+      responses:
+        '201':
+          description: Payment processed successfully
+          content:
+            application/json:
+              type: object
+              required: [id, status]
+              properties:
+                id: { type: string }
+                status: { type: string, enum: [SUCCESS, FAILED, PENDING, CANCELLED] }
+        '400':
+          description: Invalid input
+        '502':
+          description: Payment gateway error
