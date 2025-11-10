@@ -38,3 +38,14 @@ def reserve_items(items: dict[str, int]) -> tuple[bool, dict[str, dict]]:
         results = {key: {"success": value.success, "message": value.message}
                    for key, value in response.results.items()}
         return response.overallSuccess, results
+
+
+def release_items(items: dict[str, int]) -> tuple[bool, dict[str, dict]]:
+    """
+    Release (undo) reserved items in the inventory.
+    """
+    with grpc.insecure_channel(INVENTORY_ADDR) as channel:
+        stub = inventory_pb2_grpc.InventoryServiceStub(channel)
+        request = inventory_pb2.ReleaseRequest(items=items)
+        response = stub.ReleaseItems(request)
+        return response.overallSuccess, response.messages

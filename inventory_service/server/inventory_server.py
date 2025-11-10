@@ -1,8 +1,9 @@
 import json
 import logging
-from concurrent import futures
-import sys
 import os
+import sys
+from concurrent import futures
+
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 import grpc
@@ -73,6 +74,22 @@ class InventoryServiceServicer(inventory_pb2_grpc.InventoryServiceServicer):
             overall_success = False
 
         return inventory_pb2.ReserveResponse(overallSuccess=overall_success, results=results)
+
+    def ReleaseItems(self, request, context):
+        released_items = {}
+        overall_success = True
+
+        for product_id, quantity in request.items.items():
+            available_quantity = INVENTORY_DATA.get(product_id, 0)
+            INVENTORY_DATA[product_id] = available_quantity + quantity
+            released_items[product_id] = f"Released {quantity} units"
+            send_log_message("inventory", "ReleaseItems",
+                             f"Released {quantity} items of {product_id}")
+
+        return inventory_pb2.ReleaseResponse(
+            overallSuccess=overall_success,
+            messages=released_items
+        )
 
 
 def serve():
