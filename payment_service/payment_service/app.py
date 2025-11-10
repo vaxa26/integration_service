@@ -4,7 +4,7 @@ from uuid import uuid4
 from fastapi import FastAPI, HTTPException
 from payment_service.mock_data import mock_accounts
 from pydantic import BaseModel
-from rabbitmq.message_sender import send_log_message
+from payment_service.rabbitmq.message_sender import send_log_message
 
 app = FastAPI(title="Payment Service", version="1.0")
 
