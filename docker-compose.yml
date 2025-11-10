@@ -33,7 +33,15 @@ services:
         condition: service_started
     ports:
       - "50051:50051"
-
+  payment-service:
+      build: ./payment_service
+      container_name: payment-service
+      ports:
+        - "8080:8080"
+      depends_on:
+        - rabbitmq
+      environment:
+        - PYTHONUNBUFFERED=1
   oms-service:
     build: ./oms
     container_name: oms-service
