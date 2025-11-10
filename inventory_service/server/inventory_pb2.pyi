@@ -67,3 +67,31 @@ class ReserveStatus(_message.Message):
     success: bool
     message: str
     def __init__(self, success: bool = ..., message: _Optional[str] = ...) -> None: ...
+
+class ReleaseRequest(_message.Message):
+    __slots__ = ("items",)
+    class ItemsEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: int
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[int] = ...) -> None: ...
+    ITEMS_FIELD_NUMBER: _ClassVar[int]
+    items: _containers.ScalarMap[str, int]
+    def __init__(self, items: _Optional[_Mapping[str, int]] = ...) -> None: ...
+
+class ReleaseResponse(_message.Message):
+    __slots__ = ("overallSuccess", "messages")
+    class MessagesEntry(_message.Message):
+        __slots__ = ("key", "value")
+        KEY_FIELD_NUMBER: _ClassVar[int]
+        VALUE_FIELD_NUMBER: _ClassVar[int]
+        key: str
+        value: str
+        def __init__(self, key: _Optional[str] = ..., value: _Optional[str] = ...) -> None: ...
+    OVERALLSUCCESS_FIELD_NUMBER: _ClassVar[int]
+    MESSAGES_FIELD_NUMBER: _ClassVar[int]
+    overallSuccess: bool
+    messages: _containers.ScalarMap[str, str]
+    def __init__(self, overallSuccess: bool = ..., messages: _Optional[_Mapping[str, str]] = ...) -> None: ...

@@ -1,10 +1,9 @@
 syntax = "proto3";
-package inventory;
 
-// High-level contract: check and optionally reserve.
 service InventoryService {
   rpc CheckAvailability (InventoryRequest) returns (InventoryResponse);
   rpc ReserveItems (ReserveRequest) returns (ReserveResponse);
+  rpc ReleaseItems (ReleaseRequest) returns (ReleaseResponse);
 }
 
 message InventoryRequest {
@@ -12,19 +11,28 @@ message InventoryRequest {
 }
 
 message InventoryResponse {
-    map<string, bool> availability = 1;
+  map<string, bool> availability = 1;
 }
 
 message ReserveRequest {
   map<string, int32> items = 1;
 }
 
-message ReserveResponse {   
-    bool overallSuccess = 1;
-    map<string, ReserveStatus> results = 2;
+message ReserveResponse {
+  bool overallSuccess = 1;
+  map<string, ReserveStatus> results = 2;
 }
 
 message ReserveStatus {
   bool success = 1;
   string message = 2;
+}
+
+message ReleaseRequest {
+  map<string, int32> items = 1;
+}
+
+message ReleaseResponse {
+  bool overallSuccess = 1;
+  map<string, string> messages = 2;
 }
