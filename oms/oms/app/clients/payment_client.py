@@ -41,6 +41,9 @@ async def authorize(
     except httpx.RequestError as e:
         raise PaymentError(f"Payment service request error: {e}") from e
     except httpx.HTTPStatusError as e:
-        raise PaymentError(f"Payment service returned error status: {e.response.status_code}") from e
+        if e.response.status_code == 402:
+            return {"status": "DECLINED"}
+        if e.response.status_code == 404:
+            return {"status": "NOTFOUND"}
     except httpx.HTTPError as e:
         raise PaymentError(f"Payment service HTTP error: {e}") from e
