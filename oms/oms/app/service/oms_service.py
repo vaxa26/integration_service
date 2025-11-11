@@ -4,13 +4,15 @@ from typing import Optional
 from oms.app.clients import inventory_client as inventory
 from oms.app.clients import payment_client as payment
 from oms.app.schema.schema import createOrder, Order
-from oms.app.rabbitmq.message_sender import send_log_message
+from oms.app.rabbitmq.message_sender import send_log_message, send_wms_message
 from oms.app.exceptions.exceptions import PaymentDeclinedError, ReserveError, InventoryUnavailableError, \
     CustomerNotFoundError
 
 _STORE: dict[str, Order] = {}
 order_items = {"P-3344": 1, "P-8821": 2}
 
+def write_in_store(order_id, status):
+    _STORE[order_id].status = status
 
 def list_orders() -> list[Order]:
     return list(_STORE.values())
@@ -71,21 +73,22 @@ async def create_order(payload: createOrder, correlation_id: Optional[str] = Non
 
     print(f"Created payment: {pay}")
     print(f"Status of pay: {pay.get('status')} ")
-    send_log_message("oms", f"CreateOrder", f"{order_id}: Created payment {pay}")
+    send_log_message("oms", "CreateOrder", f"{order_id}: Created payment {pay}")
 
     if pay.get("status") == "DECLINED":
-        send_log_message("oms", f"CreateOrder", f"{order_id}: payment declined")
+        send_log_message("oms", "CreateOrder", f"{order_id}: payment declined")
         inventory.release_items(items_map)
         raise PaymentDeclinedError(f"Payment for customer with id {payload.customer.customerId} was declined.")
 
     if pay.get("status") == "NOTFOUND":
-        send_log_message("oms", f"CreateOrder", f"{order_id}: payment not found")
+        send_log_message("oms", "CreateOrder", f"{order_id}: payment not found")
         inventory.release_items(items_map)
         raise CustomerNotFoundError(f"Customer with id {payload.customer.customerId} was not found.")
 
     # 6) Erfolg: Order abschließen
-    send_log_message("oms", f"CreateOrder", f"{order_id}: payment successfully")
+    send_log_message("oms", "CreateOrder", f"{order_id}: payment successfully")
 
     order = Order(**payload.model_dump(), status="PROCESSED")
     _STORE[order_id] = order
+    send_wms_message(payload.json())
     return order
