@@ -11,7 +11,22 @@ EXCHANGE_NAME = "wms_event"
 
 
 def callback(ch, method, properties, body):
-    """Wird aufgerufen, wenn eine Nachricht empfangen wird."""
+    """
+    Process incoming order messages from RabbitMQ.
+    
+    This callback function handles order processing workflow:
+    1. Receives order data from the OMS
+    2. Simulates picking items (with 5 second delay)
+    3. Simulates packing order (with 5 second delay)
+    4. Simulates shipping order
+    5. Publishes status updates back to OMS at each stage
+    
+    Args:
+        ch: The RabbitMQ channel object
+        method: Method frame containing delivery information
+        properties: Message properties
+        body: The message body containing JSON-encoded order data
+    """
     data = json.loads(body)
     print(f"data: {data}")
     send_log_message("wms", "order_received", f"Received order: {data.get('order')}")
@@ -28,7 +43,23 @@ def callback(ch, method, properties, body):
 
 
 def connect_to_rabbitmq(max_retries=10, delay=5):
-    """Versucht, wiederholt eine Verbindung zu RabbitMQ aufzubauen."""
+    """
+    Attempt to establish a connection to RabbitMQ with retry logic.
+    
+    This function tries to connect to RabbitMQ multiple times with delays
+    between attempts. This is useful when RabbitMQ is starting up or
+    temporarily unavailable.
+    
+    Args:
+        max_retries: Maximum number of connection attempts (default: 10)
+        delay: Number of seconds to wait between retry attempts (default: 5)
+    
+    Returns:
+        pika.BlockingConnection: A connection object if successful
+    
+    Raises:
+        SystemExit: If all connection attempts fail
+    """
     for attempt in range(1, max_retries + 1):
         try:
             print(f"Verbindungsversuch {attempt}/{max_retries} zu RabbitMQ...")
@@ -47,7 +78,16 @@ def connect_to_rabbitmq(max_retries=10, delay=5):
 
 
 def main():
-    """Startet den Logging-Service und wartet auf Nachrichten."""
+    """
+    Start the Warehouse Management Service and wait for order messages.
+    
+    This function:
+    1. Establishes connection to RabbitMQ
+    2. Sets up the exchange and queue for receiving orders
+    3. Starts consuming messages and processing orders
+    4. Handles graceful shutdown on keyboard interrupt
+    
+    """
     connection = connect_to_rabbitmq()
     channel = connection.channel()
 

@@ -26,6 +26,25 @@ class PaymentResponse(BaseModel):
 
 @app.post("/payments", response_model=PaymentResponse, status_code=201)
 def create_payment(request: PaymentRequest):
+    """
+    Create a new payment authorization.
+    
+    This endpoint processes payment requests by:
+    1. Validating that the customer exists
+    2. Checking if the account has sufficient balance
+    3. Deducting the payment amount from the customer's balance
+    4. Creating a payment record with status "CAPTURED"
+    
+    Args:
+        request: The payment request containing order_id, customer_id, amount, and method
+    
+    Returns:
+        PaymentResponse: The created payment object with payment_id, status, and timestamps
+    
+    Raises:
+        HTTPException: 404 if the customer account is not found
+        HTTPException: 402 if the payment is declined due to insufficient funds
+    """
     print("Starting payment")
     send_log_message("payment", f"CreatePayment",
                      f"Starting payment for customer with id {request.customer_id}")

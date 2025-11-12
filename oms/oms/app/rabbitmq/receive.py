@@ -10,6 +10,16 @@ RETRY_DELAY = 5
 
 
 async def start_wms_listener():
+    """
+    Start an asynchronous RabbitMQ listener for WMS events.
+    
+    This function continuously listens for messages from the WMS service on the
+    'oms_event' exchange. It includes retry logic to handle connection failures
+    and will automatically reconnect if the connection is lost.
+    
+    The listener processes order status updates from the warehouse management system
+    and updates the order status in the OMS store accordingly.
+    """
     print("[OMS] start_wms_listener() wurde aufgerufen.")
     while True:
         print("[OMS] Starte neue Verbindungsrunde...")
@@ -24,6 +34,12 @@ async def start_wms_listener():
             await queue.bind(exchange, routing_key="oms")
 
             async def callback(message: aio_pika.IncomingMessage):
+                """
+                Async callback function to process incoming RabbitMQ messages from WMS.
+                
+                Args:
+                    message: The incoming message object containing order event data
+                """
                 async with message.process():
                     print("[OMS] Nachricht vom WMS erhalten:", message.body.decode())
                     write_in_store("1234", message)

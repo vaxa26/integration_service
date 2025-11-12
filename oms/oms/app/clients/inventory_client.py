@@ -43,6 +43,16 @@ def reserve_items(items: dict[str, int]) -> tuple[bool, dict[str, dict]]:
 def release_items(items: dict[str, int]) -> tuple[bool, dict[str, dict]]:
     """
     Release (undo) reserved items in the inventory.
+    
+    This method is typically called when an order fails (e.g., payment declined)
+    to return reserved items back to available inventory.
+    
+    Args:
+        items: A dictionary where keys are item IDs and values are the quantities to release
+    
+    Returns:
+        tuple[bool, dict[str, dict]]: A tuple containing a boolean indicating overall success
+            and a dictionary with release messages for each item
     """
     with grpc.insecure_channel(INVENTORY_ADDR) as channel:
         stub = inventory_pb2_grpc.InventoryServiceStub(channel)

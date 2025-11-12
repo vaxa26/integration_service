@@ -5,7 +5,17 @@ import pika
 
 # https://www.rabbitmq.com/tutorials/tutorial-one-python
 def publish_message(order_id: str, event: str, message: str):
-    """Sendet item_picked-Nachricht an RabbitMQ."""
+    """
+    Publish order status events to RabbitMQ for the OMS service.
+    
+    This function sends order status updates (items_picked, order_packed, order_shipped)
+    to the OMS service via the 'oms_event' exchange.
+    
+    Args:
+        order_id: The unique identifier of the order
+        event: The event type (e.g., "items_picked", "order_packed", "order_shipped")
+        message: A descriptive message about the event
+    """
 
     event_to_routing_key = {"items_picked": "item.picked",
                             "order_packed": "order.packed",

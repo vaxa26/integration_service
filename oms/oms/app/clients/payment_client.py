@@ -4,7 +4,12 @@ from oms.app.core.config import PAYMENT_URL, REQUEST_TIMEOUT
 
 
 class PaymentError(Exception):
-    """Custom exception for payment errors."""
+    """
+    Custom exception raised when payment service operations fail.
+    
+    This exception is used to wrap various payment service errors including
+    network errors, timeouts, and invalid responses.
+    """
 
 
 async def authorize(
@@ -14,6 +19,29 @@ async def authorize(
     method: str = "CARD",
     correlation_id: Optional[str] = None
 ) -> dict:
+    """
+    Authorize a payment with the payment service.
+    
+    This method sends a payment authorization request to the payment service
+    and handles various response scenarios including declined payments and
+    customer not found errors.
+    
+    Args:
+        order_id: The unique identifier of the order being paid for
+        customer_id: The unique identifier of the customer making the payment
+        amount: The payment amount as a float
+        method: The payment method (default: "CARD")
+        correlation_id: Optional correlation ID for distributed tracing
+    
+    Returns:
+        dict: A dictionary containing payment information including:
+            - payment_id: The unique payment identifier
+            - status: Payment status ("CAPTURED", "AUTHORIZED", "DECLINED", "NOTFOUND")
+            - Additional fields may be present depending on the response
+    
+    Raises:
+        PaymentError: If the payment service request fails or returns an invalid response
+    """
     headers = {}
     if correlation_id:
         headers["X-Correlation-ID"] = correlation_id

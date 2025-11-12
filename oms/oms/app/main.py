@@ -13,6 +13,15 @@ app.include_router(orders, prefix="/orders", tags=["Orders"])
 
 
 def start_wms_listener_blocking():
+    """
+    Start a blocking RabbitMQ listener for WMS events.
+    
+    This function runs in a separate thread and continuously listens for messages
+    from the WMS service on the 'oms_event' exchange. When messages are received,
+    it updates the order status in the store.
+    
+    The function includes retry logic to handle connection failures gracefully.
+    """
     print("[OMS] Listener-Thread gestartet!", flush=True)
     while True:
         print("[OMS] Thread lebt noch!", flush=True)
@@ -25,6 +34,15 @@ def start_wms_listener_blocking():
             channel.queue_bind(exchange="oms_event", queue="oms_queue", routing_key="oms")
 
             def callback(ch, method, properties, body):
+                """
+                Callback function to process incoming RabbitMQ messages from WMS.
+                
+                Args:
+                    ch: The channel object
+                    method: Method frame containing delivery information
+                    properties: Message properties
+                    body: The message body containing JSON-encoded order event data
+                """
                 print("[OMS] Nachricht empfangen:", body.decode())
                 data = json.loads(body)
                 order_id = data.get("orderId")
@@ -40,5 +58,12 @@ def start_wms_listener_blocking():
 
 @app.on_event("startup")
 def startup_event():
+    """
+    FastAPI startup event handler.
+    
+    This function is called when the FastAPI application starts. It launches
+    the WMS listener in a separate daemon thread to handle incoming order
+    status updates from the warehouse management system.
+    """
     print("[OMS] Starte Listener-Thread …")
     threading.Thread(target=start_wms_listener_blocking, daemon=True).start()

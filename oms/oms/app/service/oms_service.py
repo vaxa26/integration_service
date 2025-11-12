@@ -12,21 +12,78 @@ _STORE: dict[str, Order] = {}
 order_items = {"P-3344": 1, "P-8821": 2}
 
 def write_in_store(order_id, status):
+    """
+    Update the status of an existing order in the in-memory store.
+    
+    Args:
+        order_id: The unique identifier of the order to update
+        status: The new status to assign to the order
+    
+    Raises:
+        KeyError: If the order_id does not exist in the store
+    """
     _STORE[order_id].status = status
 
 def list_orders() -> list[Order]:
+    """
+    Retrieve all orders from the in-memory store.
+    
+    Returns:
+        list[Order]: A list containing all orders currently stored in the system
+    """
     return list(_STORE.values())
 
 
 def get_order(orderId: str) -> Order | None:
+    """
+    Retrieve a specific order by its ID from the in-memory store.
+    
+    Args:
+        orderId: The unique identifier of the order to retrieve
+    
+    Returns:
+        Order | None: The order object if found, None otherwise
+    """
     return _STORE.get(orderId)
 
 
 class DuplicateOrderError(Exception):
+    """
+    Exception raised when attempting to create an order with an ID that already exists.
+    
+    This exception is used to enforce idempotency in order creation.
+    """
     pass
 
 
 async def create_order(payload: createOrder, correlation_id: Optional[str] = None) -> Order:
+    """
+    Create a new order with full validation and processing workflow.
+    
+    This method orchestrates the complete order creation process:
+    1. Checks for duplicate order IDs (idempotency)
+    2. Validates that the total amount matches the sum of item prices
+    3. Checks inventory availability for all items
+    4. Reserves items in the inventory
+    5. Authorizes payment with the payment service
+    6. Creates and stores the order if all steps succeed
+    7. Sends order information to WMS for fulfillment
+    
+    Args:
+        payload: The order creation request containing all order details
+        correlation_id: Optional correlation ID for distributed tracing across services
+    
+    Returns:
+        Order: The created order object with status "PROCESSED"
+    
+    Raises:
+        DuplicateOrderError: If an order with the same ID already exists
+        ValueError: If the total amount doesn't match the sum of item prices
+        InventoryUnavailableError: If any requested items are not available
+        ReserveError: If item reservation fails
+        PaymentDeclinedError: If payment authorization is declined
+        CustomerNotFoundError: If the customer ID is not found in the payment service
+    """
     order_id = payload.orderId
     send_log_message("oms", f"CreateOrder",
                      f"{order_id}: Creating order")

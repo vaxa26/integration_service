@@ -7,9 +7,18 @@ INFINITE_STOCK: bool = True
 
 def check_availability(items: Dict[str, int]) -> Dict[str, bool]:
     """
-    Simuliert Lagerverfügbarkeit.
-    - Wenn INFINITE_STOCK True: alles verfügbar außer in OUT_OF_STOCK.
-    - Sonst: einfache Regel -> Menge <= 5 ist verfügbar, außer OUT_OF_STOCK.
+    Simulate inventory availability checking.
+    
+    This mock function simulates the inventory service's availability check.
+    Behavior can be controlled via module-level flags:
+    - If INFINITE_STOCK is True: all items are available except those in OUT_OF_STOCK set
+    - If INFINITE_STOCK is False: items with quantity <= 5 are available, except those in OUT_OF_STOCK set
+    
+    Args:
+        items: A dictionary where keys are product IDs and values are requested quantities
+    
+    Returns:
+        Dict[str, bool]: A dictionary mapping product IDs to availability status (True if available, False otherwise)
     """
     result: Dict[str, bool] = {}
     for pid, qty in items.items():
@@ -23,9 +32,21 @@ def check_availability(items: Dict[str, int]) -> Dict[str, bool]:
 
 def reserve_items(items: Dict[str, int]) -> Tuple[bool, Dict[str, Dict[str, object]]]:
     """
-    Simuliert Reservierung.
-    - Produkte in RESERVE_FAIL schlagen fehl.
-    - Wenn Verfügbarkeit vorher okay, ist Reservierung i. d. R. erfolgreich.
+    Simulate item reservation in the inventory.
+    
+    This mock function simulates the inventory service's reservation process.
+    Behavior can be controlled via module-level flags:
+    - Products in RESERVE_FAIL set will always fail reservation
+    - Products in OUT_OF_STOCK set will fail reservation
+    - Other products will succeed if availability was previously confirmed
+    
+    Args:
+        items: A dictionary where keys are product IDs and values are quantities to reserve
+    
+    Returns:
+        Tuple[bool, Dict[str, Dict[str, object]]]: A tuple containing:
+            - A boolean indicating overall success (True if all items reserved successfully)
+            - A dictionary mapping product IDs to reservation results with 'success' and 'message' keys
     """
     results: Dict[str, Dict[str, object]] = {}
     overall = True

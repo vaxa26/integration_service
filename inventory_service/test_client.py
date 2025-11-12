@@ -4,6 +4,13 @@ from server import inventory_pb2, inventory_pb2_grpc
 
 
 def test_check_availability():
+    """
+    Test the CheckAvailability gRPC method of the inventory service.
+    
+    This function creates a test request with sample product IDs and quantities,
+    calls the CheckAvailability method, and prints the response showing which
+    items are available.
+    """
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = inventory_pb2_grpc.InventoryServiceStub(channel)
 
@@ -18,6 +25,13 @@ def test_check_availability():
 
 
 def test_reserve_items():
+    """
+    Test the ReserveItems gRPC method of the inventory service.
+    
+    This function creates a test request with sample product IDs and quantities,
+    calls the ReserveItems method, and prints the response showing reservation
+    results for each item.
+    """
     with grpc.insecure_channel('localhost:50051') as channel:
         stub = inventory_pb2_grpc.InventoryServiceStub(channel)
 

@@ -7,7 +7,14 @@ logger = logging.getLogger()
 
 
 def send_log_message(service: str, event: str, message: str):
-    """Sendet Log-Nachrichten an RabbitMQ."""
+    """
+    Send log messages to RabbitMQ for centralized logging.
+    
+    Args:
+        service: The name of the service sending the log message (e.g., "oms", "payment")
+        event: The event type or action being logged (e.g., "CreateOrder", "PaymentDeclined")
+        message: The detailed log message describing what happened
+    """
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq"))
         channel = connection.channel()
@@ -33,7 +40,14 @@ def send_log_message(service: str, event: str, message: str):
 
 
 def send_wms_message(order: dict):
-    """Sendet item_picked-Nachricht an RabbitMQ."""
+    """
+    Send order information to the Warehouse Management System (WMS) via RabbitMQ.
+    
+    This message triggers the WMS to start processing the order (picking, packing, shipping).
+    
+    Args:
+        order: A dictionary containing the order data (typically JSON-serialized order object)
+    """
 
     try:
         connection = pika.BlockingConnection(pika.ConnectionParameters(host="rabbitmq"))

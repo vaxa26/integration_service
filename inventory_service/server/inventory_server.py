@@ -46,6 +46,22 @@ class InventoryServiceServicer(inventory_pb2_grpc.InventoryServiceServicer):
         return inventory_pb2.InventoryResponse(availability=availability)
 
     def ReserveItems(self, request, context):
+        """
+        Reserve items in the inventory.
+        
+        This gRPC method attempts to reserve the requested quantities of items.
+        If successful, the quantities are deducted from available inventory.
+        If any item cannot be reserved, the overall operation fails but partial
+        reservations may have been made.
+        
+        Args:
+            request: The gRPC request containing a map of product IDs to quantities
+            context: gRPC request context
+        
+        Returns:
+            ReserveResponse: A response containing overall success status and
+                detailed results for each item including success status and messages
+        """
         reserve_items: dict = request.items
         results: dict = {}
         overall_success: bool = True
@@ -76,6 +92,20 @@ class InventoryServiceServicer(inventory_pb2_grpc.InventoryServiceServicer):
         return inventory_pb2.ReserveResponse(overallSuccess=overall_success, results=results)
 
     def ReleaseItems(self, request, context):
+        """
+        Release previously reserved items back to available inventory.
+        
+        This gRPC method is typically called when an order fails (e.g., payment declined)
+        to return reserved items back to the available stock.
+        
+        Args:
+            request: The gRPC request containing a map of product IDs to quantities to release
+            context: gRPC request context
+        
+        Returns:
+            ReleaseResponse: A response containing overall success status and
+                messages for each released item
+        """
         released_items = {}
         overall_success = True
 
@@ -93,6 +123,13 @@ class InventoryServiceServicer(inventory_pb2_grpc.InventoryServiceServicer):
 
 
 def serve():
+    """
+    Start the gRPC inventory service server.
+    
+    This function initializes and starts the gRPC server on port 50051,
+    making the inventory service available for client connections.
+    The server runs until terminated.
+    """
     server = grpc.server(futures.ThreadPoolExecutor(max_workers=10))
     inventory_pb2_grpc.add_InventoryServiceServicer_to_server(InventoryServiceServicer(), server)
     server.add_insecure_port("[::]:50051")
