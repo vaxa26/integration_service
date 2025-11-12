@@ -9,7 +9,7 @@ from oms.app.exceptions.exceptions import PaymentDeclinedError, ReserveError, In
     CustomerNotFoundError
 
 _STORE: dict[str, Order] = {}
-order_items = {"P-3344": 1, "P-8821": 2}
+ALLOWED_RESTOCK_PID = "ORD-2025-11-4-1755"
 
 def write_in_store(order_id, status):
     _STORE[order_id].status = status
@@ -47,18 +47,60 @@ async def create_order(payload: createOrder, correlation_id: Optional[str] = Non
     # 3) INVENTORY: Verfügbarkeit prüfen
     items_map = {i.productId: i.quantity for i in payload.items}
     availability = inventory.check_availability(items_map)
-  
-    print("Checking availability")
-    if not all(availability.values()): 
-        send_log_message("oms", f"CreateOrder", f"{order_id}: Not every item available")
-        raise InventoryUnavailableError(f"Availability check for order {payload.orderId} failed.")
+    missing = {pid: qty for pid, qty in items_map.items() if not availability.get(pid, False)}
+
+    print("Checking availability du bastat")
+    if missing:
+        send_log_message("oms", "CreateOrder", f"{order_id}: missing -> {list(missing.keys())}, restocking…")
+
+        # Restock NUR für das erlaubte Produkt und NUR wenn bestellte Menge == 0
+        do_restock = (
+            ALLOWED_RESTOCK_PID in missing
+            and items_map.get(ALLOWED_RESTOCK_PID, None) == 0
+        )
+
+        if do_restock:
+            try:
+                overall, restock_results = inventory.restock_items({ALLOWED_RESTOCK_PID: missing[ALLOWED_RESTOCK_PID]})
+                send_log_message("oms", "CreateOrder", f"{order_id}: restock_results={restock_results}")
+            except Exception as e:
+                send_log_message("oms", "CreateOrder", f"{order_id}: restock RPC failed: {e}")
+                order = Order(**payload.model_dump(), status="BACKORDERED")
+                _STORE[order_id] = order
+                return order
+
+            # Re-Check nach Restock
+            availability = inventory.check_availability(items_map)
+            still_missing = [pid for pid, ok in availability.items() if not ok]
+            if still_missing:
+                order = Order(**payload.model_dump(), status="BACKORDERED")
+                _STORE[order_id] = order
+                send_log_message("oms", "CreateOrder",
+                                f"{order_id}: still missing after restock -> BACKORDERED {still_missing}")
+                return order
+            else:
+                send_log_message("oms", "CreateOrder", f"{order_id}: restock successful -> continue")
+        else:
+            # Nicht unser Sonderfall -> wie gehabt BACKORDERED
+            order = Order(**payload.model_dump(), status="BACKORDERED")
+            _STORE[order_id] = order
+            send_log_message("oms", "CreateOrder",
+                            f"{order_id}: restock not allowed (needs {ALLOWED_RESTOCK_PID} with qty 0) -> BACKORDERED")
+            return order
+        
+    # if not all(availability.values()): 
+    #     send_log_message("oms", f"CreateOrder", f"{order_id}: Not every item available")
+    #     raise InventoryUnavailableError(f"Availability check for order {payload.orderId} failed.")
 
     print("Items available. Starting reservation...")
     # 4) INVENTORY: reservieren
     reserved_ok, _results = inventory.reserve_items(items_map)
     if not reserved_ok:
         send_log_message("oms", f"CreateOrder", f"{order_id}: Couldn't reserve items")
-        raise ReserveError(f"Reservation for order {order_id} failed")
+        order = Order(**payload.model_dump(), status="CANCELLED")
+        _STORE[order_id] = order
+        send_log_message("oms", "CreateOrder", f"{order_id}: reserve failed -> CANCELLED {_results}")
+        return order
 
     send_log_message("oms", f"CreateOrder", f"{order_id}: Starting payment")
 

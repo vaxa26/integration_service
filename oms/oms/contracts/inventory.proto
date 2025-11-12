@@ -3,6 +3,7 @@ syntax = "proto3";
 service InventoryService {
   rpc CheckAvailability (InventoryRequest) returns (InventoryResponse);
   rpc ReserveItems (ReserveRequest) returns (ReserveResponse);
+  rpc RestockItems (RestockRequest) returns (RestockResponse);
   rpc ReleaseItems (ReleaseRequest) returns (ReleaseResponse);
 }
 
@@ -35,4 +36,19 @@ message ReleaseRequest {
 message ReleaseResponse {
   bool overallSuccess = 1;
   map<string, string> messages = 2;
+}
+
+message RestockRequest {
+  map<string, int32> items = 1;
+}
+
+message RestockResponse {
+  bool overallSuccess = 1;
+  map<string, RestockStatus> results = 2;
+}
+
+message RestockStatus {
+  bool success = 1;
+  string message = 2;
+  int32 added = 3; // wie viel Bestand wurde hinzugefügt
 }

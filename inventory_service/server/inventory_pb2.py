@@ -24,7 +24,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0finventory.proto\"m\n\x10InventoryRequest\x12+\n\x05items\x18\x01 \x03(\x0b\x32\x1c.InventoryRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x84\x01\n\x11InventoryResponse\x12:\n\x0c\x61vailability\x18\x01 \x03(\x0b\x32$.InventoryResponse.AvailabilityEntry\x1a\x33\n\x11\x41vailabilityEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x08:\x02\x38\x01\"i\n\x0eReserveRequest\x12)\n\x05items\x18\x01 \x03(\x0b\x32\x1a.ReserveRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x99\x01\n\x0fReserveResponse\x12\x16\n\x0eoverallSuccess\x18\x01 \x01(\x08\x12.\n\x07results\x18\x02 \x03(\x0b\x32\x1d.ReserveResponse.ResultsEntry\x1a>\n\x0cResultsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1d\n\x05value\x18\x02 \x01(\x0b\x32\x0e.ReserveStatus:\x02\x38\x01\"1\n\rReserveStatus\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"i\n\x0eReleaseRequest\x12)\n\x05items\x18\x01 \x03(\x0b\x32\x1a.ReleaseRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x8c\x01\n\x0fReleaseResponse\x12\x16\n\x0eoverallSuccess\x18\x01 \x01(\x08\x12\x30\n\x08messages\x18\x02 \x03(\x0b\x32\x1e.ReleaseResponse.MessagesEntry\x1a/\n\rMessagesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\x32\xb4\x01\n\x10InventoryService\x12:\n\x11\x43heckAvailability\x12\x11.InventoryRequest\x1a\x12.InventoryResponse\x12\x31\n\x0cReserveItems\x12\x0f.ReserveRequest\x1a\x10.ReserveResponse\x12\x31\n\x0cReleaseItems\x12\x0f.ReleaseRequest\x1a\x10.ReleaseResponseb\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x0finventory.proto\"m\n\x10InventoryRequest\x12+\n\x05items\x18\x01 \x03(\x0b\x32\x1c.InventoryRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x84\x01\n\x11InventoryResponse\x12:\n\x0c\x61vailability\x18\x01 \x03(\x0b\x32$.InventoryResponse.AvailabilityEntry\x1a\x33\n\x11\x41vailabilityEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x08:\x02\x38\x01\"i\n\x0eReserveRequest\x12)\n\x05items\x18\x01 \x03(\x0b\x32\x1a.ReserveRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x99\x01\n\x0fReserveResponse\x12\x16\n\x0eoverallSuccess\x18\x01 \x01(\x08\x12.\n\x07results\x18\x02 \x03(\x0b\x32\x1d.ReserveResponse.ResultsEntry\x1a>\n\x0cResultsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1d\n\x05value\x18\x02 \x01(\x0b\x32\x0e.ReserveStatus:\x02\x38\x01\"1\n\rReserveStatus\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\"i\n\x0eReleaseRequest\x12)\n\x05items\x18\x01 \x03(\x0b\x32\x1a.ReleaseRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x8c\x01\n\x0fReleaseResponse\x12\x16\n\x0eoverallSuccess\x18\x01 \x01(\x08\x12\x30\n\x08messages\x18\x02 \x03(\x0b\x32\x1e.ReleaseResponse.MessagesEntry\x1a/\n\rMessagesEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\t:\x02\x38\x01\"i\n\x0eRestockRequest\x12)\n\x05items\x18\x01 \x03(\x0b\x32\x1a.RestockRequest.ItemsEntry\x1a,\n\nItemsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\r\n\x05value\x18\x02 \x01(\x05:\x02\x38\x01\"\x99\x01\n\x0fRestockResponse\x12\x16\n\x0eoverallSuccess\x18\x01 \x01(\x08\x12.\n\x07results\x18\x02 \x03(\x0b\x32\x1d.RestockResponse.ResultsEntry\x1a>\n\x0cResultsEntry\x12\x0b\n\x03key\x18\x01 \x01(\t\x12\x1d\n\x05value\x18\x02 \x01(\x0b\x32\x0e.RestockStatus:\x02\x38\x01\"@\n\rRestockStatus\x12\x0f\n\x07success\x18\x01 \x01(\x08\x12\x0f\n\x07message\x18\x02 \x01(\t\x12\r\n\x05\x61\x64\x64\x65\x64\x18\x03 \x01(\x05\x32\xe7\x01\n\x10InventoryService\x12:\n\x11\x43heckAvailability\x12\x11.InventoryRequest\x1a\x12.InventoryResponse\x12\x31\n\x0cReserveItems\x12\x0f.ReserveRequest\x1a\x10.ReserveResponse\x12\x31\n\x0cRestockItems\x12\x0f.RestockRequest\x1a\x10.RestockResponse\x12\x31\n\x0cReleaseItems\x12\x0f.ReleaseRequest\x1a\x10.ReleaseResponseb\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -43,6 +43,10 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_RELEASEREQUEST_ITEMSENTRY']._serialized_options = b'8\001'
   _globals['_RELEASERESPONSE_MESSAGESENTRY']._loaded_options = None
   _globals['_RELEASERESPONSE_MESSAGESENTRY']._serialized_options = b'8\001'
+  _globals['_RESTOCKREQUEST_ITEMSENTRY']._loaded_options = None
+  _globals['_RESTOCKREQUEST_ITEMSENTRY']._serialized_options = b'8\001'
+  _globals['_RESTOCKRESPONSE_RESULTSENTRY']._loaded_options = None
+  _globals['_RESTOCKRESPONSE_RESULTSENTRY']._serialized_options = b'8\001'
   _globals['_INVENTORYREQUEST']._serialized_start=19
   _globals['_INVENTORYREQUEST']._serialized_end=128
   _globals['_INVENTORYREQUEST_ITEMSENTRY']._serialized_start=84
@@ -69,6 +73,16 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_RELEASERESPONSE']._serialized_end=827
   _globals['_RELEASERESPONSE_MESSAGESENTRY']._serialized_start=780
   _globals['_RELEASERESPONSE_MESSAGESENTRY']._serialized_end=827
-  _globals['_INVENTORYSERVICE']._serialized_start=830
-  _globals['_INVENTORYSERVICE']._serialized_end=1010
+  _globals['_RESTOCKREQUEST']._serialized_start=829
+  _globals['_RESTOCKREQUEST']._serialized_end=934
+  _globals['_RESTOCKREQUEST_ITEMSENTRY']._serialized_start=84
+  _globals['_RESTOCKREQUEST_ITEMSENTRY']._serialized_end=128
+  _globals['_RESTOCKRESPONSE']._serialized_start=937
+  _globals['_RESTOCKRESPONSE']._serialized_end=1090
+  _globals['_RESTOCKRESPONSE_RESULTSENTRY']._serialized_start=1028
+  _globals['_RESTOCKRESPONSE_RESULTSENTRY']._serialized_end=1090
+  _globals['_RESTOCKSTATUS']._serialized_start=1092
+  _globals['_RESTOCKSTATUS']._serialized_end=1156
+  _globals['_INVENTORYSERVICE']._serialized_start=1159
+  _globals['_INVENTORYSERVICE']._serialized_end=1390
 # @@protoc_insertion_point(module_scope)

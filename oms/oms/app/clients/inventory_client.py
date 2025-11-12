@@ -2,6 +2,9 @@ import grpc
 from oms.app.clients import inventory_pb2, inventory_pb2_grpc
 
 INVENTORY_ADDR = "inventory-service:50051"
+INFINITE_STOCK: bool = False
+STOCK: dict[str, int] = {"ORD-2025-11-4-1755": 0}
+ALLOW_RESTOCK: set[str] = {"ORD-2025-11-4-1755"}
 
 
 def check_availability(items: dict[str, int]) -> dict[str, bool]:
@@ -49,3 +52,13 @@ def release_items(items: dict[str, int]) -> tuple[bool, dict[str, dict]]:
         request = inventory_pb2.ReleaseRequest(items=items)
         response = stub.ReleaseItems(request)
         return response.overallSuccess, response.messages
+    
+def restock_items(items: dict[str, int]) -> tuple[bool, dict[str, dict]]:
+    if not items:
+        return True, {}
+    with grpc.insecure_channel(INVENTORY_ADDR) as channel:
+        stub = inventory_pb2_grpc.InventoryServiceStub(channel)
+        resp = stub.RestockItems(inventory_pb2.RestockRequest(items=items))
+        results = {pid: {"success": st.success, "message": st.message, "added": st.added}
+                   for pid, st in resp.results.items()}
+        return resp.overallSuccess, results

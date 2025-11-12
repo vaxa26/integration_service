@@ -44,6 +44,11 @@ class InventoryServiceStub(object):
                 request_serializer=inventory__pb2.ReserveRequest.SerializeToString,
                 response_deserializer=inventory__pb2.ReserveResponse.FromString,
                 _registered_method=True)
+        self.RestockItems = channel.unary_unary(
+                '/InventoryService/RestockItems',
+                request_serializer=inventory__pb2.RestockRequest.SerializeToString,
+                response_deserializer=inventory__pb2.RestockResponse.FromString,
+                _registered_method=True)
         self.ReleaseItems = channel.unary_unary(
                 '/InventoryService/ReleaseItems',
                 request_serializer=inventory__pb2.ReleaseRequest.SerializeToString,
@@ -61,6 +66,12 @@ class InventoryServiceServicer(object):
         raise NotImplementedError('Method not implemented!')
 
     def ReserveItems(self, request, context):
+        """Missing associated documentation comment in .proto file."""
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def RestockItems(self, request, context):
         """Missing associated documentation comment in .proto file."""
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -84,6 +95,11 @@ def add_InventoryServiceServicer_to_server(servicer, server):
                     servicer.ReserveItems,
                     request_deserializer=inventory__pb2.ReserveRequest.FromString,
                     response_serializer=inventory__pb2.ReserveResponse.SerializeToString,
+            ),
+            'RestockItems': grpc.unary_unary_rpc_method_handler(
+                    servicer.RestockItems,
+                    request_deserializer=inventory__pb2.RestockRequest.FromString,
+                    response_serializer=inventory__pb2.RestockResponse.SerializeToString,
             ),
             'ReleaseItems': grpc.unary_unary_rpc_method_handler(
                     servicer.ReleaseItems,
@@ -145,6 +161,33 @@ class InventoryService(object):
             '/InventoryService/ReserveItems',
             inventory__pb2.ReserveRequest.SerializeToString,
             inventory__pb2.ReserveResponse.FromString,
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
+
+    @staticmethod
+    def RestockItems(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/InventoryService/RestockItems',
+            inventory__pb2.RestockRequest.SerializeToString,
+            inventory__pb2.RestockResponse.FromString,
             options,
             channel_credentials,
             insecure,

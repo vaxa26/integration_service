@@ -3,7 +3,9 @@ from typing import Dict, Tuple
 # --- Verhalten steuerbar ---
 OUT_OF_STOCK: set[str] = set()
 RESERVE_FAIL: set[str] = set()
-INFINITE_STOCK: bool = True
+INFINITE_STOCK: bool = False
+STOCK: dict[str, int] = {"ORD-2025-11-4-1755": 0}
+ALLOW_RESTOCK: set[str] = {"ORD-2025-11-4-1755"}
 
 def check_availability(items: Dict[str, int]) -> Dict[str, bool]:
     """
@@ -15,10 +17,8 @@ def check_availability(items: Dict[str, int]) -> Dict[str, bool]:
     for pid, qty in items.items():
         if pid in OUT_OF_STOCK:
             result[pid] = False
-        elif INFINITE_STOCK:
-            result[pid] = True
         else:
-            result[pid] = qty <= 5
+            result[pid] = STOCK.get(pid, 0) >= qty
     return result
 
 def reserve_items(items: Dict[str, int]) -> Tuple[bool, Dict[str, Dict[str, object]]]:
@@ -38,4 +38,17 @@ def reserve_items(items: Dict[str, int]) -> Tuple[bool, Dict[str, Dict[str, obje
             overall = False
         else:
             results[pid] = {"success": True, "message": f"reserved {qty} (mock)"}
+    return overall, results
+
+def restock_items(items: Dict[str, int]) -> Tuple[bool, Dict[str, Dict[str, object]]]:
+    overall = True
+    results: Dict[str, Dict[str, object]] = {}
+    for pid, qty in items.items():
+        if pid in ALLOW_RESTOCK:  # NUR diese ID darf nachbestellt werden
+            added = max(qty, 1)
+            STOCK[pid] = STOCK.get(pid, 0) + added
+            results[pid] = {"success": True, "message": "restocked (mock)", "added": added}
+        else:
+            results[pid] = {"success": False, "message": "restock not allowed", "added": 0}
+            overall = False
     return overall, results
