@@ -36,3 +36,8 @@ class Order(createOrder):
     status: str = Field(default="Pending")
     createdAt: datetime = Field(default_factory=datetime.utcnow)
     updatedAt: Optional[datetime] = None
+
+
+class OrderStatus(BaseModel):
+    orderId: str
+    status: str
